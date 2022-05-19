@@ -5,6 +5,9 @@
 #include <linux/livepatch.h>
 #include <linux/uuid.h>
 
+#define AX_UKRAINE_ENABLE 	0x03
+#define DSM_FUNC_11AX_ENABLEMENT 0x06
+
 int new_iwl_acpi_get_dsm_u32(struct device *dev, int rev, int func,
 			 const guid_t *guid, u32 *value);
 
@@ -34,9 +37,9 @@ static struct klp_patch patch = {
 int new_iwl_acpi_get_dsm_u32(struct device *dev, int rev, int func,
 			 const guid_t *guid, u32 *value)
 {
-	if ((func == 0x06)&&(guid_equal(guid, &iwl1_guid)))
+	if ((func == DSM_FUNC_11AX_ENABLEMENT)&&(guid_equal(guid, &iwl1_guid)))
 	{	
-		*value = 0x03;		
+		*value = AX_UKRAINE_ENABLE;		
 		return 0;
 	}
 	
