@@ -6,6 +6,8 @@
 #include <linux/uuid.h>
 
 #define AX_UKRAINE_ENABLE 	0x03
+#define AX_RUSSIA_ENABLE	0x0c
+#define AX_ENABLE_BITMAP	AX_UKRAINE_ENABLE
 #define DSM_FUNC_11AX_ENABLEMENT 0x06
 
 int new_iwl_acpi_get_dsm_u32(struct device *dev, int rev, int func,
@@ -39,7 +41,7 @@ int new_iwl_acpi_get_dsm_u32(struct device *dev, int rev, int func,
 {
 	if ((func == DSM_FUNC_11AX_ENABLEMENT)&&(guid_equal(guid, &iwl1_guid)))
 	{	
-		*value = AX_UKRAINE_ENABLE;		
+		*value = AX_ENABLE_BITMAP;		
 		return 0;
 	}
 	
