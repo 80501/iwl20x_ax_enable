@@ -1,5 +1,3 @@
-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/livepatch.h>
@@ -7,7 +5,7 @@
 
 #define AX_UKRAINE_ENABLE 	0x03
 #define AX_RUSSIA_ENABLE	0x0c
-#define AX_ENABLE_BITMAP	AX_UKRAINE_ENABLE
+#define AX_ENABLE_BITMAP	AX_UKRAINE_ENABLE|AX_RUSSIA_ENABLE
 #define DSM_FUNC_11AX_ENABLEMENT 0x06
 
 int new_iwl_acpi_get_dsm_u32(struct device *dev, int rev, int func,
