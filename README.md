@@ -14,5 +14,6 @@ Generate and enroll (if not yet) an X.509 key pair [as described.](https://docs.
 `# /usr/src/kernels/$(uname -r)/scripts/sign-file sha256 <your_mok_key>.priv <your_mok_key>.der iwl20x_ax_en.ko` (skip this for Secure Boot disabled system)  
 `# cp ./iwl20x_ax_en.ko /lib/modules/$(uname -r)/`  
 `# cat ./iwlwifi.conf >> /etc/modprobe.d/iwlwifi.conf`  
-`# depmod -a`  
-`# reboot`
+`# depmod -a`    
+
+Reboot.
