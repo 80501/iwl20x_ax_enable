@@ -9,6 +9,6 @@ The module `iwl20x_ax_en.ko` should be signed with your MOK key if the system bo
 ## Installation
 \# make  
 \# cp ./iwl20x_ax_en.ko /lib/modules/$(uname -r)/  
-\# cat ./iwlwifi.conf >> /etc/modprobe.d/iwlfifi.conf  
+\# cat ./iwlwifi.conf >> /etc/modprobe.d/iwlwifi.conf  
 \# depmod -a  
 \# reboot
