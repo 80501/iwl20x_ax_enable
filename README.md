@@ -6,7 +6,7 @@ The module should be loaded as regular livepatch. `iwl20x_ax_en` should be loade
 The module `iwl20x_ax_en.ko` should be signed with your MOK key if the system boots in EFI Secure Boot mode. (See RHEL documentation on Signing kernel modules for secure boot)
 
 ## Requirements
-Linux kernel version >=5.14 _or_ RHEL release >=8.6.
+Linux upstream kernel version >=5.14 _or_ RHEL release >=8.6. Your distribution kernel might be compatible, so try this patch anyway.
 
 ## Installation  
 
