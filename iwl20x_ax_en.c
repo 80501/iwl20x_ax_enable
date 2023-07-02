@@ -43,7 +43,7 @@ int new_iwl_acpi_get_dsm_u32(struct device *dev, int rev, int func,
 		return 0;
 	}
 	
-	#ifdef X86_KERNEL_IBT
+	#ifdef CONFIG_X86_KERNEL_IBT
 	int r_code;
 
 	funcs->nop=true;
