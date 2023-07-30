@@ -43,9 +43,21 @@ int new_iwl_acpi_get_dsm_u32(struct device *dev, int rev, int func,
 		return 0;
 	}
 	
+	#ifdef CONFIG_X86_KERNEL_IBT
+	int r_code;
+
+	funcs->nop=true;
+	r_code=((int (*)(struct device *, int, int, const guid_t *, 
+		u32 *))(funcs->old_func))(dev, 
+		rev, func, guid, value);
+	funcs->nop=false;
+	return r_code;
+
+	#else	
 	return ((int (*)(struct device *, int, int, const guid_t *, 
 		u32 *))((funcs->old_func)+MCOUNT_INSN_SIZE))(dev, 
 		rev, func, guid, value);
+	#endif
 }
 
 static int livepatch_init(void)
