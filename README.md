@@ -8,14 +8,22 @@ The module `iwl20x_ax_en.ko` should be signed with your MOK key if the system bo
 ## Requirements
 Linux kernel version >=5.14 _or_ RHEL release >=8.6.
 
-## Installation  
+## Installation 
+
+### Installation commands for Ubuntu
+```
+sudo apt install dkms git build-essential linux-headers-$(uname -r)
+cd ~
+git clone https://github.com/80501/iwl20x_ax_enable.git
+cd iwl20x_ax_enable
+sudo make dkms-install
+cat ./iwlwifi.conf >> /etc/modprobe.d/iwlwifi.conf  
+``` 
 
 Generate and enroll (if not yet) an X.509 key pair [as described.](https://docs.fedoraproject.org/en-US/fedora/latest/system-administrators-guide/kernel-module-driver-configuration/Working_with_Kernel_Modules/) (If the system boots in EFI Secure Boot mode.)
 
 `# make`  
 `# /usr/src/kernels/$(uname -r)/scripts/sign-file sha256 <your_mok_key>.priv <your_mok_key>.der iwl20x_ax_en.ko` (skip this for SecureBoot-disabled system)  
-`# cp ./iwl20x_ax_en.ko /lib/modules/$(uname -r)/`  
-`# cat ./iwlwifi.conf >> /etc/modprobe.d/iwlwifi.conf`  
-`# depmod -a`    
+
 
 Reboot or reload `iwlwifi`.
