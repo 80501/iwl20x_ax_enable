@@ -19,3 +19,6 @@ Generate and enroll (if not yet) an X.509 key pair [as described.](https://docs.
 `# depmod -a`    
 
 Reboot or reload `iwlwifi`.
+
+## Links
+DKMS version of the patch: https://github.com/selukov/iwl20x_ax_enable/tree/default
