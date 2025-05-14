@@ -9,31 +9,45 @@
 #define AX_ENABLE_BITMAP	AX_UKRAINE_ENABLE|AX_RUSSIA_ENABLE
 
 enum iwl_dsm_funcs {
-    DSM_FUNC_QUERY = 0,
-    DSM_FUNC_DISABLE_SRD = 1,
-    DSM_FUNC_ENABLE_INDONESIA_5G2 = 2,
-    DSM_FUNC_ENABLE_6E = 3,
-    DSM_FUNC_REGULATORY_CONFIG = 4,
-    DSM_FUNC_11AX_ENABLEMENT = 6,
-    DSM_FUNC_ENABLE_UNII4_CHAN = 7,
-    DSM_FUNC_ACTIVATE_CHANNEL = 8,
-    DSM_FUNC_FORCE_DISABLE_CHANNELS = 9,
-    DSM_FUNC_ENERGY_DETECTION_THRESHOLD = 10,
-    DSM_FUNC_RFI_CONFIG = 11,
-    DSM_FUNC_ENABLE_11BE = 12,
-    DSM_FUNC_NUM_FUNCS = 13,
+	DSM_FUNC_QUERY = 0,
+	DSM_FUNC_DISABLE_SRD = 1,
+	DSM_FUNC_ENABLE_INDONESIA_5G2 = 2,
+	DSM_FUNC_ENABLE_6E = 3,
+	DSM_FUNC_REGULATORY_CONFIG = 4,
+	DSM_FUNC_11AX_ENABLEMENT = 6,
+	DSM_FUNC_ENABLE_UNII4_CHAN = 7,
+	DSM_FUNC_ACTIVATE_CHANNEL = 8,
+	DSM_FUNC_FORCE_DISABLE_CHANNELS = 9,
+	DSM_FUNC_ENERGY_DETECTION_THRESHOLD = 10,
+	DSM_FUNC_RFI_CONFIG = 11,
+	DSM_FUNC_ENABLE_11BE = 12,
+	DSM_FUNC_NUM_FUNCS = 13,
 };
 
+struct iwl_lari_config_change_cmd {
+	__le32 config_bitmap;
+	__le32 oem_uhb_allow_bitmap;
+	__le32 oem_11ax_allow_bitmap;
+	__le32 oem_unii4_allow_bitmap;
+	__le32 chan_state_active_bitmap;
+	__le32 force_disable_channels_bitmap;
+	__le32 edt_bitmap;
+	__le32 oem_320mhz_allow_bitmap;
+	__le32 oem_11be_allow_bitmap;
+} __packed;
+
 int new_iwl_acpi_get_dsm_u32(struct device *dev, int rev, int func,
-			 const guid_t *guid, u32 *value);
+		const guid_t *guid, u32 *value);
 			 
 int new_iwl_bios_get_dsm(void *fwrt, enum iwl_dsm_funcs func,
-	     u32 *value);
+		u32 *value);
+	
+int new_iwl_fill_lari_config(void *fwrt, 
+		struct iwl_lari_config_change_cmd *cmd, size_t *cmd_size);
 
 const guid_t iwl1_guid = GUID_INIT(0xF21202BF, 0x8F78, 0x4DC6,
-		  0xA5, 0xB3, 0x1F, 0x73,
-		  0x8E, 0x28, 0x5A, 0xDE);
-
+		0xA5, 0xB3, 0x1F, 0x73,
+		0x8E, 0x28, 0x5A, 0xDE);
 
 static struct klp_func func_acpi_get_dsm_u32[] = {
 	{
@@ -46,6 +60,13 @@ static struct klp_func func_iwl_bios_get_dsm[] = {
 	{
 		.old_name = "iwl_bios_get_dsm",
 		.new_func = new_iwl_bios_get_dsm,
+	}, { }
+};
+
+static struct klp_func func_iwl_fill_lari_config[] = {
+	{
+		.old_name = "iwl_fill_lari_config",
+		.new_func = new_iwl_fill_lari_config,
 	}, { }
 };
 
@@ -114,6 +135,30 @@ int new_iwl_bios_get_dsm(void *fwrt, enum iwl_dsm_funcs func,
 	#endif
 }
 
+int new_iwl_fill_lari_config(void *fwrt, 
+	struct iwl_lari_config_change_cmd *cmd, size_t *cmd_size)
+{
+	int r_code;
+
+	#ifdef CONFIG_X86_KERNEL_IBT
+	func_iwl_bios_get_dsm->nop=true;
+	r_code=((int (*)(void *, struct iwl_lari_config_change_cmd *, size_t *))
+	     	(func_iwl_fill_lari_config->old_func))
+		(fwrt, cmd, cmd_size);
+	func_iwl_bios_get_dsm->nop=false;
+
+	return r_code;
+	
+	#else
+	r_code=((int (*)(void *, struct iwl_lari_config_change_cmd *, size_t *))
+		((func_iwl_fill_lari_config->old_func)+MCOUNT_INSN_SIZE))
+	     	(fwrt, cmd, cmd_size);
+	#endif
+	
+	cmd->oem_11ax_allow_bitmap = cpu_to_le32(AX_ENABLE_BITMAP);
+	return r_code;
+}
+
 static int lookup_fn(const char *fn_name)
 {
 	struct kprobe test_kp;
@@ -129,11 +174,12 @@ static int lookup_fn(const char *fn_name)
 
 static int livepatch_init(void)
 {
-
-	if (lookup_fn(func_iwl_bios_get_dsm->old_name) == 0)
-		objs->funcs = func_iwl_bios_get_dsm;		
 	if (lookup_fn(func_acpi_get_dsm_u32->old_name) == 0)
 		objs->funcs = func_acpi_get_dsm_u32;
+	if (lookup_fn(func_iwl_bios_get_dsm->old_name) == 0)
+		objs->funcs = func_iwl_bios_get_dsm;
+	if (lookup_fn(func_iwl_fill_lari_config->old_name) == 0)
+		objs->funcs = func_iwl_fill_lari_config;
 	if (objs->funcs == NULL)
 		return -ENOENT;
 
