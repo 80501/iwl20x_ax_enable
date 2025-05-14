@@ -146,8 +146,6 @@ int new_iwl_fill_lari_config(void *fwrt,
 	     	(func_iwl_fill_lari_config->old_func))
 		(fwrt, cmd, cmd_size);
 	func_iwl_bios_get_dsm->nop=false;
-
-	return r_code;
 	
 	#else
 	r_code=((int (*)(void *, struct iwl_lari_config_change_cmd *, size_t *))
